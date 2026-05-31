@@ -14,6 +14,7 @@ client = genai.Client(api_key = api_key)
 response = client.models.generate_content(
     model="gemini-2.5-flash",
     contents="안녕! 한 문장으로 자기소개 해줘."
-)
+) # 모델과 내용을 지정하여 응답을 생성하는 메서드 호출
+
 
 print(response.text)
