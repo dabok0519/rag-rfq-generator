@@ -1,25 +1,61 @@
-from langchain_community.document_loaders import PyPDFLoader
 
-loader = PyPDFLoader("표준하도급계약서.pdf")   # ← 어제 쓴 PDF 경로
+from langchain_community.document_loaders import  Docx2txtLoader
+import re # 정규식 패턴 
+from langchain_core.documents import Document # # LangChain 표준 데이터 그릇 - 우리가 직접 만들 때 사용
+
+from langchain_text_splitters import RecursiveCharacterTextSplitter   
+
+
+
+
+loader = Docx2txtLoader("표준하도급계약서.docx")   # ← 어제 쓴 PDF 경로
 docs = loader.load()          # ← 여기서 뭐가 나올까? -> PDF 내의 텍스트 추출 
+
+splitter = RecursiveCharacterTextSplitter(
+    chunk_size=500,
+    chunk_overlap=10,
+)
+
 
 # 검증 1: 몇 개가 나왔나?
 print(len(docs))
 
 # 검증 2: 첫 번째 요소의 정체는?
+
+# 1) "제○조(제목)" 위치를 모두 찾기
 print(type(docs[0]))                #  LangChain의 표준 데이터 그릇
 print(docs[0].page_content[:200])   # 내용 앞부분 ( 200글자까지만 출력 )
 print(docs[0].metadata)             # 현재 page_content에 대한 메타 데이터 출력 
 
 
-from langchain_text_splitters import RecursiveCharacterTextSplitter
+# ===== 조항별 분할 (splitter 전에!) =====
+full_text = docs[0].page_content   # DOCX는 한 덩어리로 들어옴
 
-splitter = RecursiveCharacterTextSplitter(
-    chunk_size=500,        # 한 청크 최대 글자 수 => chunk_size=500은 상한선(최대)이지 정확히 맞춰야 할 목표가 아님 
-    chunk_overlap=10,     # 청크 간 겹치는 글자 수 
-)
 
-chunks = splitter.split_documents(docs)   # ← docs는 STEP 2의 그 43개
+# 2) 각 조항 시작~다음 조항 시작 전까지를 한 조각으로 자르기
+pattern = r'제\s*\d+\s*조\s*\([^)]*\)'
+matches = list(re.finditer(pattern, full_text))  # finditer는 위치(start)까지 줌
+
+article_docs = []
+for i, m in enumerate(matches):
+    title = m.group()  # 예: '제13조(목적물의 제조등)'
+    start = m.start()  # 이 조항이 시작하는 위치
+    if i + 1 < len(matches):  # 다음 조항 시작 위치 (마지막이면 끝까지)
+        end = matches[i+1].start()
+    else:
+        end = len(full_text)
+    body = full_text[start:end]  # 조항 본문 통째로
+    article_docs.append(
+        Document(page_content=body, metadata={"source": "표준하도급계약서.docx", "article": title})
+    )
+
+print("조항 개수:", len(article_docs))   # 90 근처 떠야 정상
+
+
+chunks = splitter.split_documents(article_docs)   # docs(통짜) 아니라 article_docs!
+
+
+
 
 # 검증
 print(len(chunks))                 # chunk_size를 정해 준 후 총 몇개의 청크로 분리되었나 ? 
