@@ -31,34 +31,47 @@ def format_context(docs):
     return "\n\n".join(blocks)
 
 
-PROMPT_TEMPLATE = """너는 구매 담당자를 돕는 어시스턴트다.
-아래 [근거]에 있는 내용만 사용해서 질문에 답하라.
+RFQ_CLAUSE_PROMPT = """너는 구매 계약서를 돕는 어시스턴트다.
+아래 [근거 조항]만 사용해서, RFQ에 들어갈 '거래 조건' 항목을 정리하라.
 
 규칙:
-- 근거에 없는 내용은 지어내지 말고 "근거에서 찾을 수 없습니다"라고 답하라.
-- 답변 끝에 사용한 근거의 출처(문서명, 페이지)를 표시하라.
+- 근거에 있는 내용만 쓸 것. 없으면 지어내지 말 것.
+- 각 항목 끝에 출처(조항명)를 표시할 것.
+- 품목/수량/납기/단가 같은 건 여기서 다루지 말 것.
 
-[근거]
+[근거 조항]
 {context}
 
-[답변]
-
+[거래 조건]
 """
 
-# === while 루프 교체 ===
 while True:
-    query = input("\n질문 (종료: q): ")
-    if query == "q":
+    item = input("\n품목 (종료: q): ")
+    if item == "q":
         break
+    qty = input("수량: ")
+    due = input("납기일: ")
 
-    docs = retriever.invoke(query)  # 입력받은 질문(query)을 기반으로 리트리버(retriever)를 통해 관련 문서(docs)들을 검색해 결과를 반환 
-    context = format_context(docs) # 검색된 문서들을 LLM이 이해하기 좋은 하나의 텍스트 포맷(문맥, context)으로 결합/가공
-    prompt = PROMPT_TEMPLATE.format(context=context, question=query) # 미리 정의해둔 프롬프트 템플릿에 가공된 문맥(context)과 사용자의 질문(query)을 채워 넣음 
+    search_query = "대금지급 납기 품질보증 하자담보 지체상금"
+    docs = retriever.invoke(search_query)
+    context = format_context(docs)
+    prompt = RFQ_CLAUSE_PROMPT.format(context=context)
 
-    # 일단 LLM 호출 전에 프롬프트부터 눈으로 확인
-    print("\n===== 조립된 프롬프트 =====")
-    print(prompt)
+    clause = llm.invoke(prompt).content
 
-    answer = llm.invoke(prompt)     # 완성된 프롬프트를 LLM 모델에 전달하여 실행(invoke)하고 결과(답변 객체)를 반환 
-    print("\n===== 답변 =====")
-    print(answer.content)  # LLM이 생성한 답변 내용 중 실제 텍스트 메시지(content)만 추출하여 출력 
+    rfq = f"""===== RFQ (견적요청서) 초안 =====
+
+[1. 구매 품목]
+- 품목: {item}
+- 수량: {qty}
+- 납기일: {due}
+
+[2. 거래 조건]
+{clause}
+
+[3. 공급사 기재란]
+- 단가: 
+- 총 견적금액: 
+- 회신 기한: 
+"""
+    print(rfq)
