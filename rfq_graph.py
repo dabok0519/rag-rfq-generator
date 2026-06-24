@@ -227,8 +227,8 @@ result = {
 
 """
 
-
-if __name__ == "__main__":
+"""
+if __name__ == "__main__":  # 이 파일을 직접(python rfq_graph.py) 실행할 때만 이 블록을 돌리는 코드로 그래프를 테스트하는 것 
     result = app.invoke({
         "purchase_request": {"item": "볼트","quantity" : "100", "due_date": "2026-07-30"}  # quantity 일부러 뺌
     })
@@ -249,4 +249,4 @@ if __name__ == "__main__":
             print(f"[{i}] {article}")
             print(doc.page_content[:100], "...\n")
         print("\n" + "=" * 40)
-        print(result["rfq_draft"])
+        print(result["rfq_draft"])"""
