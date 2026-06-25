@@ -25,7 +25,15 @@ from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_chroma import Chroma
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv()  # 로컬: .env에서 키 읽기
+
+# 클라우드(Streamlit Cloud) 대응: .env가 없고 키가 아직 없으면 st.secrets에서 가져온다
+if not os.getenv("GOOGLE_API_KEY"):
+    try:
+        import streamlit as st
+        os.environ["GOOGLE_API_KEY"] = st.secrets["GOOGLE_API_KEY"]
+    except Exception:
+        pass
 
 # 기존 search_cli.py와 동일하게 vectorstore 불러오기
 embeddings = GoogleGenerativeAIEmbeddings(model="gemini-embedding-001")
