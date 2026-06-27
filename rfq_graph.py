@@ -154,6 +154,7 @@ def search_node(state: RFQState) -> dict:
     for q in queries:
         merged.extend(retriever.invoke(q))
     docs = dedup_by_article(merged)
+    docs = docs[:6]                    # ← 이 줄 추가
 
     # 가드 ②: 그래도 0건이면 고정 쿼리로 재검색
     if not docs:
