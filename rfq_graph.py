@@ -232,23 +232,23 @@ def generate_node(state: RFQState) -> dict:
     reply_due = (today + timedelta(days=7)).strftime('%Y-%m-%d')  # 회신기한: 발행일+7일
 
     # f-string 직접 조립 — 사용자 입력값(①)은 LLM을 거치지 않는다(무결성 보장)
-    rfq = f"""# 📋 견적요청서 (RFQ)
+    rfq = f"""## 📋 견적요청서 (RFQ)
 
 - **문서번호**: {doc_no}
 - **발행일자**: {issue_date}
 - **회신기한**: {reply_due}
 
-## 1. 구매 요청 정보
+### 1. 구매 요청 정보
 
 - **품목**: {req.get('item', '-')}
 - **수량**: {req.get('quantity', '-')}
 - **희망 납기일**: {req.get('due_date', '-')}
 - **책정 예산**: {req.get('budget', '-')}
 
-## 2. 거래 조건 (표준계약 근거)
+### 2. 거래 조건 (표준계약 근거)
 {clause}
 
-## 3. 공급사 회신란
+### 3. 공급사 회신란
 
 - **공급사명**:
 - **제안 단가**:
@@ -256,7 +256,7 @@ def generate_node(state: RFQState) -> dict:
 - **납품 가능일**:
 - **비고**:
 
-## 4. 근거 표준조항
+### 4. 근거 표준조항
 본 RFQ의 거래조건은 아래 표준조항을 근거로 작성되었습니다.
 - {sources}
 

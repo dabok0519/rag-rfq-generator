@@ -1,22 +1,36 @@
 import streamlit as st
 from rfq_graph import app   # 컴파일된 그래프 가져오기
 
+
+def format_won(amount):
+    """원 단위 정수를 한국식 표기로. 1200000 → '1,200,000원 (120만원)'"""
+    try:
+        amount = int(amount)
+    except (ValueError, TypeError):
+        return str(amount)
+    exact = f"{amount:,}원"
+    if amount >= 10000 and amount % 10000 == 0:
+        return f"{exact} ({amount // 10000:,}만원)"
+    return exact
+
+
 st.title("RAG 기반 RFQ 생성기")   # 화면 맨 위 제목
 
 # --- 입력 폼 ---
 item = st.text_input("품목")
 quantity = st.number_input("수량",min_value = 0 , step = 1)
+unit = st.selectbox("단위", ["개(EA)", "kg", "m", "롤", "세트", "식", "건"])
 due_date = st.date_input("납기일") 
-budget = st.number_input("예산",min_value = 0.0 , step = 1.0)
+budget = st.number_input("예산 (원)", min_value=0, step=100000, format="%d")
 
 # --- 생성 버튼 ---
 if st.button("RFQ 생성"):
     # 1) 입력값을 dict로 묶기
     purchase_request = {
         "item": item,
-        "quantity": quantity,
+        "quantity": f"{quantity} {unit}",   # ← 수량+단위를 코드가 직접 조립
         "due_date": due_date.strftime("%Y-%m-%d"),   # date → 문자열로 변환 
-        "budget": budget,
+        "budget": format_won(budget),
     }
 
     # 2) 그래프 호출
