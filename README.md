@@ -152,13 +152,26 @@ docker run -p 8501:8501 -e GOOGLE_API_KEY="your_key_here" rfq-app
 
 ```
 rag-rfq-generator/
+│
 ├── app.py               # Streamlit 웹앱 (배포 진입점)
 ├── rfq_graph.py         # LangGraph 상태 그래프 (analyze→search→generate)
 ├── rag_langchain.py     # 코퍼스 로드 → 조문 분할 → 임베딩 → Chroma 저장
+├── rfq_generator.py     # RFQ 초안 생성 (그래프化 이전 단일 RAG 버전, 참고용)
+├── vector.py            # ChromaDB 벡터 저장소 관리
+│
+├── chatbot.py           # CLI 챗봇 인터페이스 (개발·테스트용)
+├── RFQ_AGENT.py         # 에이전트 진입점 (개발·테스트용)
 ├── search_cli.py        # 검색 + 출처 표시 RAG 질의 (CLI, 개발용)
-├── rfq_generator.py     # RFQ 초안 생성 컴포넌트 (그래프化 이전 단일 RAG 버전)
-├── chroma_db/           # Chroma 영구 저장 디렉터리 (174벡터)
-├── 표준하도급계약서.docx   # 표준계약 조항 코퍼스
+├── btp_client.py        # SAP BTP ERP 연동 (XSUAA 인증 + OData V4)
+│
+├── embedding_test.py    # 임베딩 품질 검증 스크립트
+├── eva_search.py        # 검색 결과 평가 스크립트
+├── chunk.py             # 청킹 모듈
+├── chunk_pk.py          # 청킹 파라미터 실험용
+├── chunk_result.py      # 청킹 결과 확인용
+├── compare_loader.py    # 로더 비교 실험용
+│
+├── chroma_db/           # Chroma 영구 저장 디렉터리 (174벡터, 배포용 포함)
 ├── requirements.txt     # 의존성
 ├── Dockerfile           # 컨테이너 빌드 정의
 └── README.md
