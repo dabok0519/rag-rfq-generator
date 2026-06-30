@@ -155,13 +155,17 @@ rag-rfq-generator/
 ├── app.py               # Streamlit 웹앱 (배포 진입점)
 ├── rfq_graph.py         # LangGraph 상태 그래프 (analyze→search→generate)
 ├── rag_langchain.py     # 코퍼스 로드 → 조문 분할 → 임베딩 → Chroma 저장
-├── search_cli.py        # 검색 + 출처 표시 RAG 질의 (CLI, 개발용)
-├── rfq_generator.py     # RFQ 초안 생성 컴포넌트 (그래프化 이전 단일 RAG 버전)
+├── btp_client.py        # SAP BTP XSUAA 토큰 취득 standalone probe
+│                        #   (shared plan 제약으로 런타임 통합 보류,
+│                        #    BTP 연동 가능성 검증용으로 보존)
+├── rfq_generator.py     # RFQ 초안 생성 컴포넌트 (그래프化 이전 단일 RAG 버전, 참고용)
 ├── chroma_db/           # Chroma 영구 저장 디렉터리 (174벡터)
 ├── 표준하도급계약서.docx   # 표준계약 조항 코퍼스
 ├── requirements.txt     # 의존성
 ├── Dockerfile           # 컨테이너 빌드 정의
-└── README.md
+├── README.md
+└── archive/             # 15일 구현 여정 학습·실험 스크립트
+                         #   (vector.py · chunk*.py · embedding_test.py 등)
 ```
 
 ---
