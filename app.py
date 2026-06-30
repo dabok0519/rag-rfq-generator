@@ -17,7 +17,7 @@ def format_won(amount):
 st.title("RAG 기반 RFQ 생성기")   # 화면 맨 위 제목
 
 # --- 입력 폼 ---
-item = st.text_input("품목")
+item = st.text_input("품목", placeholder="예: 볼트, 강판, 노트북, 유지보수 용역")
 quantity = st.number_input("수량",min_value = 0 , step = 1)
 unit = st.selectbox("단위", ["개(EA)", "kg", "m", "롤", "세트", "식", "건"])
 due_date = st.date_input("납기일") 
